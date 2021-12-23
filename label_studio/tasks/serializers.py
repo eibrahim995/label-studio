@@ -100,6 +100,17 @@ class AnnotationSerializer(ModelSerializer):
         name += f' {user.email}, {user.id}'
         return name
 
+    def update(self, instance, validated_data):
+        if self.context['request'].user.om_through.first().role == 'AN':
+            validated_data['annotator'] = self.context['request'].user
+            validated_data['status'] = 'review'
+
+        elif self.context['request'].user.om_through.first().role == 'RV':
+            validated_data['reviewer'] = self.context['request'].user
+            validated_data['status'] = 'done'
+
+        return super().update(instance, validated_data)
+
     class Meta:
         model = Annotation
         exclude = ['prediction', 'result_count']

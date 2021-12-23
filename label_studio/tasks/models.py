@@ -276,6 +276,10 @@ AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 class Annotation(AnnotationMixin, models.Model):
     """ Annotations & Labeling results
     """
+    STATUS_CHOICES = [
+        ('review', "In Review"),
+        ('done', "Done"),
+    ]
     objects = AnnotationManager()
     tracker = FieldTracker(fields=['ground_truth', 'result'])
 
@@ -286,6 +290,11 @@ class Annotation(AnnotationMixin, models.Model):
                              help_text='Corresponding task for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
+    annotator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="actual_annotations", on_delete=models.SET_NULL,
+                                     null=True, help_text='User ID of the annotator')
+    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="reviews", on_delete=models.SET_NULL,
+                                     null=True, help_text='User ID of the reviewer')
+    status = models.CharField(max_length=6, choices=STATUS_CHOICES, default='review')
     was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')

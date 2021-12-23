@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 class OrganizationMember(models.Model):
     """
     """
+    ROLE_CHOICES = [
+        ('AN', 'Annotator'),
+        ('RV', 'Reviewer'),
+    ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='om_through',
         help_text='User ID'
@@ -24,7 +28,11 @@ class OrganizationMember(models.Model):
         'organizations.Organization', on_delete=models.CASCADE,
         help_text='Organization ID'
     )
-    
+    role = models.CharField(
+        max_length=2,
+        choices=ROLE_CHOICES,
+        default='AN'
+    )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 

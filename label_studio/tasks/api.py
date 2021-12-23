@@ -312,6 +312,14 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         if 'completed_by' not in ser.validated_data:
             extra_args['completed_by'] = self.request.user
 
+        if self.request.user.om_through.first().role == 'AN':
+            extra_args['annotator'] = self.request.user
+            extra_args['status'] = 'review'
+
+        elif self.request.user.om_through.first().role == 'RV':
+            extra_args['reviewer'] = self.request.user
+            extra_args['status'] = 'done'
+
         # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
         annotation = ser.save(**extra_args)
